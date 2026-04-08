@@ -1,7 +1,7 @@
 use simple_dns::{Packet, PacketFlag, RCODE};
 use std::net::UdpSocket;
 
-const UPSTREAM: &str = "1.1.1.1:53";
+const UPSTREAM: &str = "8.8.8.8:53";
 const LISTEN: &str = "0.0.0.0:53";
 const BUF_SIZE: usize = 512;
 
