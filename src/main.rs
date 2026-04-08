@@ -1,5 +1,5 @@
 use simple_dns::{Packet, PacketFlag, RCODE};
-use std::net::UdpSocket;
+use std::{collections::HashSet, net::UdpSocket};
 
 const UPSTREAM: &str = "8.8.8.8:53";
 const LISTEN: &str = "0.0.0.0:53";
@@ -10,6 +10,8 @@ fn main() -> std::io::Result<()> {
     println!("Listening on {LISTEN}");
 
     let mut buf = [0u8; BUF_SIZE];
+
+    let blacklist = HashSet::from(["google.com".to_string()]);
 
     loop {
         let (len, src) = socket.recv_from(&mut buf)?;
@@ -30,6 +32,18 @@ fn main() -> std::io::Result<()> {
             .unwrap_or_else(|| "<no question>".to_string());
 
         println!("{src} -> {domain}");
+
+        if blacklist.contains(&domain) {
+            println!("blocked!");
+            if let Ok(mut reply) = Packet::parse(raw) {
+                reply.set_flags(PacketFlag::RESPONSE);
+                *reply.rcode_mut() = RCODE::NameError;
+                if let Ok(bytes) = reply.build_bytes_vec() {
+                    socket.send_to(&bytes, src)?;
+                }
+            }
+            continue;
+        }
 
         // Forward to upstream and relay response back
         match forward(raw) {
