@@ -11,7 +11,7 @@ fn main() -> std::io::Result<()> {
 
     let mut buf = [0u8; BUF_SIZE];
 
-    let blacklist = HashSet::from(["google.com".to_string()]);
+    let blacklist = HashSet::new();
 
     loop {
         let (len, src) = socket.recv_from(&mut buf)?;
