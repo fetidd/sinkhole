@@ -11,7 +11,7 @@ fn main() -> std::io::Result<()> {
 
     let mut buf = [0u8; BUF_SIZE];
 
-    let blacklist = HashSet::new();
+    let blacklist: HashSet<String> = HashSet::new();
 
     loop {
         let (len, src) = socket.recv_from(&mut buf)?;
